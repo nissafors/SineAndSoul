@@ -1,1 +1,1 @@
-﻿WARNING! Nothing works yet. License will be MIT.
+﻿WARNING! Almost nothing works yet.
