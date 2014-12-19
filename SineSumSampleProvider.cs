@@ -1,8 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿//-----------------------------------------------------------------------
+// SineAndSoul: SineSumSampleProvider.cs
+//
+// Copyright (c) 2014 Andreas Andersson
+//
+// This software may be modified and distributed under the terms
+// of the MIT license.  See the LICENSE file for details.
+//-----------------------------------------------------------------------
 
 namespace SineAndSoul
 {
@@ -12,7 +15,7 @@ namespace SineAndSoul
 
     /// <summary>
     /// Provides a buffer that NAudio can read from by adding sine waves. The characteristics of the
-    /// waves are sent through the constructor.
+    /// waves are set using the properties Tones and Amplitudes.
     /// </summary>
     class SineSumSampleProvider : ISampleProvider
     {
@@ -22,7 +25,14 @@ namespace SineAndSoul
         // Number of samples into the wave
         private double time = 0;
 
-        public double[] Frequencies { private get; set; }
+        /// <summary>
+        /// Sets the overtone frequencies for each tone playing.
+        /// </summary>
+        public List<double[]> Tones { private get; set; }
+
+        /// <summary>
+        /// Sets the amplitudes for each overtone.
+        /// </summary>
         public double[] Amplitudes { private get; set; }
 
         /// <summary>
@@ -60,10 +70,17 @@ namespace SineAndSoul
                 i = 0;
 
                 // Loop through the harmonics and add them together
-                foreach (double frequency in Frequencies)
+                foreach (double[] frequencies in Tones)
                 {
-                    sample += Amplitudes[i++] * Math.Sin(2 * Math.PI * frequency * time/sampleRate);
-                    if (i >= Amplitudes.Length) i = 0;
+                    if (frequencies.Length != Amplitudes.Length)
+                    {
+                        throw new InvalidOperationException("The number of frequences in each tone is not the same as the number of amplitudes.");
+                    }
+                    foreach (double frequency in frequencies)
+                    {
+                        sample += Amplitudes[i++] * Math.Sin(2 * Math.PI * frequency * time / sampleRate);
+                        if (i >= Amplitudes.Length) i = 0;
+                    }
                 }
                 
                 time++;
