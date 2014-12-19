@@ -32,6 +32,7 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MixerGroupBox = new System.Windows.Forms.GroupBox();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -67,11 +68,21 @@
             this.quitToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
             this.quitToolStripMenuItem.Text = "Quit";
             // 
+            // MixerGroupBox
+            // 
+            this.MixerGroupBox.Location = new System.Drawing.Point(13, 28);
+            this.MixerGroupBox.Name = "MixerGroupBox";
+            this.MixerGroupBox.Size = new System.Drawing.Size(704, 382);
+            this.MixerGroupBox.TabIndex = 2;
+            this.MixerGroupBox.TabStop = false;
+            this.MixerGroupBox.Text = "Overtone Mixer";
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(729, 422);
+            this.Controls.Add(this.MixerGroupBox);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainWindow";
@@ -89,6 +100,7 @@
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
+        private System.Windows.Forms.GroupBox MixerGroupBox;
 
     }
 }
