@@ -28,7 +28,7 @@ namespace SineAndSoul
         /// <summary>
         /// Sets the overtone frequencies for each tone playing.
         /// </summary>
-        public List<double[]> Tones { private get; set; }
+        public List<double[]> Tones { get; set; }
 
         /// <summary>
         /// Sets the amplitudes for each overtone.
@@ -45,6 +45,7 @@ namespace SineAndSoul
         public SineSumSampleProvider(int sampleRate, int channel)
         {
             waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(sampleRate, channel);
+            Tones = new List<double[]>();
         }
 
         /// <summary>

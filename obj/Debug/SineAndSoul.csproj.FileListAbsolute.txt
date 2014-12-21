@@ -9,3 +9,4 @@ C:\Users\Andreas\Documents\Visual Studio 2013\Projects\NAudio Youtube Tutorial\S
 C:\Users\Andreas\Documents\Visual Studio 2013\Projects\NAudio Youtube Tutorial\SineAndSoul\obj\Debug\SineAndSoul.exe
 C:\Users\Andreas\Documents\Visual Studio 2013\Projects\NAudio Youtube Tutorial\SineAndSoul\obj\Debug\SineAndSoul.pdb
 C:\Users\Andreas\Documents\Visual Studio 2013\Projects\NAudio Youtube Tutorial\SineAndSoul\obj\Debug\SineAndSoul.MainWindow.resources
+C:\Users\Andreas\Documents\Visual Studio 2013\Projects\NAudio Youtube Tutorial\SineAndSoul\obj\Debug\SineAndSoul.SettingsWindow.resources
