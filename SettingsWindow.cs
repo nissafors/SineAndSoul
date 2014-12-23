@@ -18,25 +18,27 @@ namespace SineAndSoul
     public partial class SettingsWindow : Form
     {
         // A reference to the MainWindow object opening this window
-        private MainWindow caller;
+        //private MainWindow caller;
 
         /// <summary>
         /// Initializes a new instance of the SettingsWindow class.
         /// </summary>
         /// <param name="caller">A reference to the MainWindow object opening this window.</param>
-        public SettingsWindow(MainWindow caller)
+        public SettingsWindow()
         {
             InitializeComponent();
 
-            this.caller = caller;
+            this.UpdateControls();
+        }
 
-            // Get current settings from MainWindow
-            this.DelimiterTextBox.Text = caller.ImportDelimiter.ToString();
-            this.DecimalMarkTextBox.Text = caller.ImportDecimalMark.ToString();
-            this.FrequenciesPerLineNumeric.Value = caller.ImportFrequenciesPerLine;
-            this.LatencyNumeric.Value = caller.Latency;
-            this.SaveStateCheckBox.Checked = caller.SaveState;
-            this.SaveSettingsCheckBox.Checked = caller.SaveSettings;
+        private void UpdateControls()
+        {
+            this.DelimiterTextBox.Text = Properties.Settings.Default.ImportDelimiter.ToString();
+            this.DecimalMarkTextBox.Text = Properties.Settings.Default.ImportDecimalMark.ToString();
+            this.FrequenciesPerLineNumeric.Value = Properties.Settings.Default.FrequenciesPerLine;
+            this.LatencyNumeric.Value = Properties.Settings.Default.Latency;
+            this.SaveSettingsCheckBox.Checked = Properties.Settings.Default.SaveSettingsOnExit;
+            this.SaveStateCheckBox.Checked = Properties.Settings.Default.SaveStateOnExit;
         }
 
         /// <summary>
@@ -55,13 +57,13 @@ namespace SineAndSoul
                 return;
             }
 
-            // Set properties in MainWindow
-            caller.ImportDelimiter = Convert.ToChar(this.DelimiterTextBox.Text);
-            caller.ImportDecimalMark = Convert.ToChar(this.DecimalMarkTextBox.Text);
-            caller.ImportFrequenciesPerLine = (int)this.FrequenciesPerLineNumeric.Value;
-            caller.Latency = (int)this.LatencyNumeric.Value;
-            caller.SaveSettings = this.SaveSettingsCheckBox.Checked;
-            caller.SaveState = this.SaveStateCheckBox.Checked;
+            // Save settings
+            Properties.Settings.Default.ImportDelimiter = Convert.ToChar(this.DelimiterTextBox.Text);
+            Properties.Settings.Default.ImportDecimalMark = Convert.ToChar(this.DecimalMarkTextBox.Text);
+            Properties.Settings.Default.FrequenciesPerLine = (int)this.FrequenciesPerLineNumeric.Value;
+            Properties.Settings.Default.Latency = (int)this.LatencyNumeric.Value;
+            Properties.Settings.Default.SaveSettingsOnExit = this.SaveSettingsCheckBox.Checked;
+            Properties.Settings.Default.SaveStateOnExit = this.SaveStateCheckBox.Checked;
 
             this.Dispose();
             this.Close();
@@ -76,6 +78,12 @@ namespace SineAndSoul
         {
             this.Dispose();
             this.Close();
+        }
+
+        private void ResetButton_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.Reset();
+            this.UpdateControls();
         }
     }
 }

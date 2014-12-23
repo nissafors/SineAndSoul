@@ -42,32 +42,32 @@ namespace SineAndSoul
         /// <summary>
         /// Gets or sets the value delimiter when importing CSV files. Default is ','.
         /// </summary>
-        public char ImportDelimiter { get; set; }
+        //public char ImportDelimiter { get; set; }
 
         /// <summary>
         /// Gets or sets the decimal mark when importing CSV files. Default is '.'.
         /// </summary>
-        public char ImportDecimalMark { get; set; }
+        //public char ImportDecimalMark { get; set; }
 
         /// <summary>
         /// Number of frequencies per line to read from CSV file.
         /// </summary>
-        public int ImportFrequenciesPerLine { get; set; }
+        //public int ImportFrequenciesPerLine { get; set; }
 
         /// <summary>
         /// Gets or sets the boolean value indicating wether to auto save program state on exit.
         /// </summary>
-        public bool SaveState { get; set; }
+        //public bool SaveState { get; set; }
 
         /// <summary>
         /// Gets or sets the boolean value indicating wether to auto save settings on exit.
         /// </summary>
-        public bool SaveSettings { get; set; }
+        //public bool SaveSettings { get; set; }
 
         /// <summary>
         /// Desired audio latency in milliseconds.
         /// </summary>
-        public int Latency { get; set; }
+        //public int Latency { get; set; }
 
         /// <summary>
         /// Initialize a new instance of the MainWindow class. The user controls the application from within this window.
@@ -78,12 +78,12 @@ namespace SineAndSoul
             InitializeComponent();
 
             // Default values
-            this.ImportDelimiter = ';';
-            this.ImportDecimalMark = ',';
-            this.ImportFrequenciesPerLine = 12;
-            this.Latency = 300;
-            this.SaveState = true;
-            this.SaveSettings = true;
+            //this.ImportDelimiter = ';';
+            //this.ImportDecimalMark = ',';
+            //this.ImportFrequenciesPerLine = 12;
+            //this.Latency = 300;
+            //this.SaveState = true;
+            //this.SaveSettings = true;
 
             // Init audio
             this.sinePlayer = new SineSumSampleProvider(44100, 1);
@@ -94,7 +94,8 @@ namespace SineAndSoul
         {
             this.audioOut = null;
             this.audioOut = new WaveOut();
-            this.audioOut.DesiredLatency = this.Latency;
+            //this.audioOut.DesiredLatency = this.Latency;
+            this.audioOut.DesiredLatency = Properties.Settings.Default.Latency;
             this.audioOut.Init(sinePlayer);
         }
 
@@ -209,22 +210,22 @@ namespace SineAndSoul
             // Show import settings window
             
             // Do import
-            CsvFrequencyReader read = new CsvFrequencyReader(open.FileName, ';', ',', ImportFrequenciesPerLine);
+            CsvFrequencyReader read = new CsvFrequencyReader(open.FileName, ';', ',', Properties.Settings.Default.FrequenciesPerLine);
             read.Read();
             tonesAvailable = read.ToArray();
 
             // Calculate default initial amplitudes
-            amplitudes = new double[ImportFrequenciesPerLine];
+            amplitudes = new double[Properties.Settings.Default.FrequenciesPerLine];
             double nextAmplitude = 0.8;
-            for (int i = 0; i < ImportFrequenciesPerLine; i++)
+            for (int i = 0; i < Properties.Settings.Default.FrequenciesPerLine; i++)
             {
                 amplitudes[i] = nextAmplitude;
                 nextAmplitude /= 1.5;
             }
 
-            savedAmplitudes = new double[ImportFrequenciesPerLine];
+            savedAmplitudes = new double[(int)Properties.Settings.Default.FrequenciesPerLine];
             sinePlayer.Amplitudes = amplitudes;
-            InitializeMixer(ImportFrequenciesPerLine);
+            InitializeMixer(Properties.Settings.Default.FrequenciesPerLine);
 
             audioOut.Play();
         }
@@ -236,7 +237,6 @@ namespace SineAndSoul
         /// <param name="e">Arguments passed.</param>
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Dispose();
             this.Close();
         }
 
@@ -248,6 +248,11 @@ namespace SineAndSoul
         /// <param name="e">Arguments passed.</param>
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
+            if (tonesAvailable == null || tonesAvailable.Length == 0)
+            {
+                return;
+            }
+
             switch (e.KeyCode)
             {
                 case Keys.Z:
@@ -345,6 +350,11 @@ namespace SineAndSoul
         /// <param name="e">Arguments passed.</param>
         private void MainWindow_KeyUp(object sender, KeyEventArgs e)
         {
+            if (tonesAvailable == null || tonesAvailable.Length == 0)
+            {
+                return;
+            }
+
             switch (e.KeyCode)
             {
                 case Keys.Z:
@@ -427,12 +437,36 @@ namespace SineAndSoul
             this.audioOut.Stop();
 
             // Open settings dialog
-            SettingsWindow settings = new SettingsWindow(this);
+            SettingsWindow settings = new SettingsWindow();
             settings.ShowDialog();
 
             // Re-initialize audio to reflect latency changes
             this.InitializeAudio();
             this.audioOut.Play();
+        }
+
+        /// <summary>
+        /// Read program state from XML file: Available tones, amplitudes and mutes.
+        /// </summary>
+        private void ReadState()
+        {
+        }
+
+        /// <summary>
+        /// Write program state to XML file: Available tones, amplitudes and mutes.
+        /// </summary>
+        private void WriteState()
+        {
+        }
+
+        private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (Properties.Settings.Default.SaveSettingsOnExit)
+            {
+                Properties.Settings.Default.Save();
+            }
+
+            this.Dispose();
         }
     }
 }
