@@ -49,18 +49,6 @@ namespace SineAndSoul.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool SaveStateOnExit {
-            get {
-                return ((bool)(this["SaveStateOnExit"]));
-            }
-            set {
-                this["SaveStateOnExit"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("200")]
         public int Latency {
             get {

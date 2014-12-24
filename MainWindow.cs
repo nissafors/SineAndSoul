@@ -40,36 +40,6 @@ namespace SineAndSoul
         private PianoKeys keysState;
 
         /// <summary>
-        /// Gets or sets the value delimiter when importing CSV files. Default is ','.
-        /// </summary>
-        //public char ImportDelimiter { get; set; }
-
-        /// <summary>
-        /// Gets or sets the decimal mark when importing CSV files. Default is '.'.
-        /// </summary>
-        //public char ImportDecimalMark { get; set; }
-
-        /// <summary>
-        /// Number of frequencies per line to read from CSV file.
-        /// </summary>
-        //public int ImportFrequenciesPerLine { get; set; }
-
-        /// <summary>
-        /// Gets or sets the boolean value indicating wether to auto save program state on exit.
-        /// </summary>
-        //public bool SaveState { get; set; }
-
-        /// <summary>
-        /// Gets or sets the boolean value indicating wether to auto save settings on exit.
-        /// </summary>
-        //public bool SaveSettings { get; set; }
-
-        /// <summary>
-        /// Desired audio latency in milliseconds.
-        /// </summary>
-        //public int Latency { get; set; }
-
-        /// <summary>
         /// Initialize a new instance of the MainWindow class. The user controls the application from within this window.
         /// </summary>
         public MainWindow()
@@ -77,24 +47,39 @@ namespace SineAndSoul
             // Draw designer controls
             InitializeComponent();
 
-            // Default values
-            //this.ImportDelimiter = ';';
-            //this.ImportDecimalMark = ',';
-            //this.ImportFrequenciesPerLine = 12;
-            //this.Latency = 300;
-            //this.SaveState = true;
-            //this.SaveSettings = true;
-
             // Init audio
             this.sinePlayer = new SineSumSampleProvider(44100, 1);
             this.InitializeAudio();
         }
 
+        /// <summary>
+        /// Bitfield used to track which computer keyboard "piano" keys are currently pressed.
+        /// </summary>
+        [Flags]
+        enum PianoKeys
+        {
+            None = 0x0,
+            Z = 0x1,
+            S = 0x2,
+            X = 0x4,
+            D = 0x8,
+            C = 0x10,
+            V = 0x20,
+            G = 0x40,
+            B = 0x80,
+            H = 0x100,
+            N = 0x200,
+            J = 0x400,
+            M = 0x800
+        }
+
+        /// <summary>
+        /// Reset and initialize the audio driver.
+        /// </summary>
         private void InitializeAudio()
         {
             this.audioOut = null;
             this.audioOut = new WaveOut();
-            //this.audioOut.DesiredLatency = this.Latency;
             this.audioOut.DesiredLatency = Properties.Settings.Default.Latency;
             this.audioOut.Init(sinePlayer);
         }
@@ -105,6 +90,15 @@ namespace SineAndSoul
         /// <param name="fadersCount">The number of overtones to mix.</param>
         private void InitializeMixer(int fadersCount)
         {
+            const int FADER_WIDTH = 50;
+            const int FADER_HEIGHT = 300;
+            const int FADER_MARGIN = 30;
+            const int MUTE_WIDTH = FADER_WIDTH;
+            const int MUTE_HEIGHT = 30;
+            const int MUTE_MARGIN = 15;
+            const int MUTE_DISTANCE = 340;
+            const int GROUPBOX_MARGIN = 10;
+
             if (this.mixerFaders != null)
             {
                 // Remove old mixer controls
@@ -121,9 +115,9 @@ namespace SineAndSoul
             {
                 // Faders
                 this.mixerFaders[i] = new TrackBar();
-                this.mixerFaders[i].Location = new System.Drawing.Point(30 + 50 * i, 30);
+                this.mixerFaders[i].Location = new System.Drawing.Point(FADER_MARGIN + FADER_WIDTH * i, FADER_MARGIN);
                 this.mixerFaders[i].Name = Convert.ToString(i);
-                this.mixerFaders[i].Size = new System.Drawing.Size(50, 300);
+                this.mixerFaders[i].Size = new System.Drawing.Size(FADER_WIDTH, FADER_HEIGHT);
                 this.mixerFaders[i].TabIndex = i * 2;
                 this.mixerFaders[i].Orientation = Orientation.Vertical;
                 this.mixerFaders[i].Maximum = 100;
@@ -134,9 +128,9 @@ namespace SineAndSoul
                 // Mute buttons
                 this.mixerMutes[i] = new CheckBox();
                 this.mixerMutes[i].Appearance = Appearance.Button;
-                this.mixerMutes[i].Location = new System.Drawing.Point(15 + 50 * i, 340);
+                this.mixerMutes[i].Location = new System.Drawing.Point(MUTE_MARGIN + MUTE_WIDTH * i, MUTE_DISTANCE);
                 this.mixerMutes[i].Name = Convert.ToString(i);
-                this.mixerMutes[i].Size = new System.Drawing.Size(50, 30);
+                this.mixerMutes[i].Size = new System.Drawing.Size(MUTE_WIDTH, MUTE_HEIGHT);
                 this.mixerMutes[i].Text = "Mute";
                 this.mixerMutes[i].ForeColor = System.Drawing.Color.Black;
                 this.mixerMutes[i].TabIndex = 1 + i * 2;
@@ -146,6 +140,10 @@ namespace SineAndSoul
             // Add controls to parent
             this.MixerGroupBox.Controls.AddRange(this.mixerFaders);
             this.MixerGroupBox.Controls.AddRange(this.mixerMutes);
+
+            // Change window size to fit mixer
+            this.MixerGroupBox.Width = FADER_MARGIN + FADER_WIDTH * fadersCount;
+            this.Width = FADER_MARGIN * 2 + FADER_WIDTH * fadersCount + GROUPBOX_MARGIN;
         }
 
         /// <summary>
@@ -192,7 +190,7 @@ namespace SineAndSoul
         /// </summary>
         /// <param name="sender">Calling object.</param>
         /// <param name="e">Arguments passed.</param>
-        private void importToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ImportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Kill audio
             audioOut.Stop();
@@ -207,12 +205,26 @@ namespace SineAndSoul
                 return;
             }
 
-            // Show import settings window
-            
             // Do import
-            CsvFrequencyReader read = new CsvFrequencyReader(open.FileName, ';', ',', Properties.Settings.Default.FrequenciesPerLine);
-            read.Read();
-            tonesAvailable = read.ToArray();
+            CsvFrequencyReader reader = new CsvFrequencyReader(
+                open.FileName,
+                Properties.Settings.Default.ImportDelimiter,
+                Properties.Settings.Default.ImportDecimalMark,
+                Properties.Settings.Default.FrequenciesPerLine);
+            if (!reader.Read())
+            {
+                // Read failed
+                MessageBox.Show(
+                    "Import failed! Make sure settings are compatible with csv format.",
+                    "Error!",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                audioOut.Play();
+                return;
+            }
+
+            // Load new tones
+            tonesAvailable = reader.ToArray();
 
             // Calculate default initial amplitudes
             amplitudes = new double[Properties.Settings.Default.FrequenciesPerLine];
@@ -235,7 +247,7 @@ namespace SineAndSoul
         /// </summary>
         /// <param name="sender">Calling object.</param>
         /// <param name="e">Arguments passed.</param>
-        private void quitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void QuitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
         }
@@ -408,30 +420,12 @@ namespace SineAndSoul
             }
         }
 
-        [Flags]
-        enum PianoKeys
-        {
-            None = 0x0,
-            Z = 0x1,
-            S = 0x2,
-            X = 0x4,
-            D = 0x8,
-            C = 0x10,
-            V = 0x20,
-            G = 0x40,
-            B = 0x80,
-            H = 0x100,
-            N = 0x200,
-            J = 0x400,
-            M = 0x800
-        }
-
-        private void fileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Occurs when the user selects Settings in the File menu. Opens the settings dialog.
+        /// </summary>
+        /// <param name="sender">Calling control.</param>
+        /// <param name="e">Arguments passed.</param>
+        private void SettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Kill audio
             this.audioOut.Stop();
@@ -446,19 +440,10 @@ namespace SineAndSoul
         }
 
         /// <summary>
-        /// Read program state from XML file: Available tones, amplitudes and mutes.
+        /// Occurs when this form is closing. Save settings and dispose.
         /// </summary>
-        private void ReadState()
-        {
-        }
-
-        /// <summary>
-        /// Write program state to XML file: Available tones, amplitudes and mutes.
-        /// </summary>
-        private void WriteState()
-        {
-        }
-
+        /// <param name="sender">Calling object.</param>
+        /// <param name="e">Arguments passed.</param>
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (Properties.Settings.Default.SaveSettingsOnExit)
@@ -466,6 +451,7 @@ namespace SineAndSoul
                 Properties.Settings.Default.Save();
             }
 
+            this.audioOut.Dispose();
             this.Dispose();
         }
     }

@@ -39,7 +39,6 @@
             this.DelimiterTextBox = new System.Windows.Forms.TextBox();
             this.AutoSaveGroupBox = new System.Windows.Forms.GroupBox();
             this.SaveSettingsCheckBox = new System.Windows.Forms.CheckBox();
-            this.SaveStateCheckBox = new System.Windows.Forms.CheckBox();
             this.AudioGroupBox = new System.Windows.Forms.GroupBox();
             this.label4 = new System.Windows.Forms.Label();
             this.LatencyNumeric = new System.Windows.Forms.NumericUpDown();
@@ -154,10 +153,9 @@
             // AutoSaveGroupBox
             // 
             this.AutoSaveGroupBox.Controls.Add(this.SaveSettingsCheckBox);
-            this.AutoSaveGroupBox.Controls.Add(this.SaveStateCheckBox);
             this.AutoSaveGroupBox.Location = new System.Drawing.Point(218, 12);
             this.AutoSaveGroupBox.Name = "AutoSaveGroupBox";
-            this.AutoSaveGroupBox.Size = new System.Drawing.Size(200, 90);
+            this.AutoSaveGroupBox.Size = new System.Drawing.Size(200, 66);
             this.AutoSaveGroupBox.TabIndex = 0;
             this.AutoSaveGroupBox.TabStop = false;
             this.AutoSaveGroupBox.Text = "Auto save";
@@ -165,22 +163,12 @@
             // SaveSettingsCheckBox
             // 
             this.SaveSettingsCheckBox.AutoSize = true;
-            this.SaveSettingsCheckBox.Location = new System.Drawing.Point(21, 52);
+            this.SaveSettingsCheckBox.Location = new System.Drawing.Point(20, 26);
             this.SaveSettingsCheckBox.Name = "SaveSettingsCheckBox";
             this.SaveSettingsCheckBox.Size = new System.Drawing.Size(124, 17);
             this.SaveSettingsCheckBox.TabIndex = 6;
             this.SaveSettingsCheckBox.Text = "Save settings on exit";
             this.SaveSettingsCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // SaveStateCheckBox
-            // 
-            this.SaveStateCheckBox.AutoSize = true;
-            this.SaveStateCheckBox.Location = new System.Drawing.Point(21, 26);
-            this.SaveStateCheckBox.Name = "SaveStateCheckBox";
-            this.SaveStateCheckBox.Size = new System.Drawing.Size(111, 17);
-            this.SaveStateCheckBox.TabIndex = 5;
-            this.SaveStateCheckBox.Text = "Save state on exit";
-            this.SaveStateCheckBox.UseVisualStyleBackColor = true;
             // 
             // AudioGroupBox
             // 
@@ -263,7 +251,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.GroupBox AutoSaveGroupBox;
         private System.Windows.Forms.CheckBox SaveSettingsCheckBox;
-        private System.Windows.Forms.CheckBox SaveStateCheckBox;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown FrequenciesPerLineNumeric;
         private System.Windows.Forms.GroupBox AudioGroupBox;

@@ -23,7 +23,6 @@ namespace SineAndSoul
         /// <summary>
         /// Initializes a new instance of the SettingsWindow class.
         /// </summary>
-        /// <param name="caller">A reference to the MainWindow object opening this window.</param>
         public SettingsWindow()
         {
             InitializeComponent();
@@ -31,6 +30,9 @@ namespace SineAndSoul
             this.UpdateControls();
         }
 
+        /// <summary>
+        /// Make controls reflect current settings.
+        /// </summary>
         private void UpdateControls()
         {
             this.DelimiterTextBox.Text = Properties.Settings.Default.ImportDelimiter.ToString();
@@ -38,7 +40,6 @@ namespace SineAndSoul
             this.FrequenciesPerLineNumeric.Value = Properties.Settings.Default.FrequenciesPerLine;
             this.LatencyNumeric.Value = Properties.Settings.Default.Latency;
             this.SaveSettingsCheckBox.Checked = Properties.Settings.Default.SaveSettingsOnExit;
-            this.SaveStateCheckBox.Checked = Properties.Settings.Default.SaveStateOnExit;
         }
 
         /// <summary>
@@ -63,7 +64,6 @@ namespace SineAndSoul
             Properties.Settings.Default.FrequenciesPerLine = (int)this.FrequenciesPerLineNumeric.Value;
             Properties.Settings.Default.Latency = (int)this.LatencyNumeric.Value;
             Properties.Settings.Default.SaveSettingsOnExit = this.SaveSettingsCheckBox.Checked;
-            Properties.Settings.Default.SaveStateOnExit = this.SaveStateCheckBox.Checked;
 
             this.Dispose();
             this.Close();
@@ -80,6 +80,11 @@ namespace SineAndSoul
             this.Close();
         }
 
+        /// <summary>
+        /// Occurs when the user clicks the Restore default button. Resets settings to default.
+        /// </summary>
+        /// <param name="sender">Calling control.</param>
+        /// <param name="e">Arguments passed.</param>
         private void ResetButton_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.Reset();

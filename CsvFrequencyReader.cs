@@ -23,13 +23,13 @@ namespace SineAndSoul
 
         /// <summary>
         /// The char that separates values in the file. Default is ','.
-        /// Warning! ReadFrequenciesFromFile() can't read the file if DecimalMark == Separator.
+        /// Warning! ReadFrequenciesFromFile() can't read the file if DecimalMark == Delimiter.
         /// </summary>
-        public char Separator { get; set; }
+        public char Delimiter { get; set; }
 
         /// <summary>
         /// The decimal mark used in this file. Default is '.';
-        /// Warning! ReadFrequenciesFromFile() can't read the file if DecimalMark == Separator.
+        /// Warning! ReadFrequenciesFromFile() can't read the file if DecimalMark == Delimiter.
         /// </summary>
         public char DecimalMark { get; set; }
 
@@ -66,7 +66,7 @@ namespace SineAndSoul
         public CsvFrequencyReader(string path, char separator, char decimalMark, int frequenciesPerTone)
         {
             this.Path = path;
-            this.Separator = separator;
+            this.Delimiter = separator;
             this.DecimalMark = decimalMark;
             this.FrequenciesPerTone = frequenciesPerTone;
             tones = new List<double[]>();
@@ -96,7 +96,7 @@ namespace SineAndSoul
         public bool Read()
         {
             // Do nothing if properties are bad
-            if (this.Path == string.Empty || this.Separator == this.DecimalMark) return false;
+            if (this.Path == string.Empty || this.Delimiter == this.DecimalMark) return false;
 
             using (StreamReader textReader = new StreamReader(Path))
             {
@@ -104,7 +104,7 @@ namespace SineAndSoul
                 {
                     // Read comma separated values (or rather semicolon separated values) into a string array
                     string line = textReader.ReadLine();
-                    string[] values = line.Split(this.Separator);
+                    string[] values = line.Split(this.Delimiter);
                     
                     double[] tone = new double[this.FrequenciesPerTone];
                     int toneIndex = 0;
@@ -114,7 +114,7 @@ namespace SineAndSoul
                     // Extract values. First row may be a header. If more than one row on a line can't be converted to double, skip that line
                     while(toneIndex < this.FrequenciesPerTone)
                     {
-                        if (DecimalMark != '.')
+                        if (DecimalMark != '.' && valuesIndex < values.Length)
                         {
                             values[valuesIndex] = values[valuesIndex].Replace(DecimalMark, '.');
                         }
