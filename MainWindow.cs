@@ -28,6 +28,9 @@ namespace SineAndSoul
         // The tones avaiblable for playing
         private double[][] tonesAvailable;
 
+        // The midi number of the lowest tone available.
+        private int baseMidiNumber;
+
         // The overtones amplitudes
         private double[] amplitudes;
         private double[] savedAmplitudes;
@@ -36,8 +39,7 @@ namespace SineAndSoul
         private TrackBar[] mixerFaders;
         private CheckBox[] mixerMutes;
 
-        // Tracking the state of the computer keyboard keys that can be used to play tones instead of MIDI keyboard
-        private PianoKeys keysState;
+        private bool[] midiNumbersPlaying = new bool[128];
 
         /// <summary>
         /// Initialize a new instance of the MainWindow class. The user controls the application from within this window.
@@ -53,25 +55,9 @@ namespace SineAndSoul
         }
 
         /// <summary>
-        /// Bitfield used to track which computer keyboard "piano" keys are currently pressed.
+        /// Indicates wether a tone should start or stop playing.
         /// </summary>
-        [Flags]
-        enum PianoKeys
-        {
-            None = 0x0,
-            Z = 0x1,
-            S = 0x2,
-            X = 0x4,
-            D = 0x8,
-            C = 0x10,
-            V = 0x20,
-            G = 0x40,
-            B = 0x80,
-            H = 0x100,
-            N = 0x200,
-            J = 0x400,
-            M = 0x800
-        }
+        private enum Toggle { Play, Stop }
 
         /// <summary>
         /// Reset and initialize the audio driver.
@@ -205,12 +191,23 @@ namespace SineAndSoul
                 return;
             }
 
+            // Let the user adjust import settings
+            ImportWindow options = new ImportWindow();
+            options.ShowDialog();
+            if (!options.Import)
+            {
+                // The user clicked cancel.
+                audioOut.Play();
+                return;
+            }
+
             // Do import
             CsvFrequencyReader reader = new CsvFrequencyReader(
                 open.FileName,
-                Properties.Settings.Default.ImportDelimiter,
-                Properties.Settings.Default.ImportDecimalMark,
-                Properties.Settings.Default.FrequenciesPerLine);
+                options.Delimiter,
+                options.DecimalMark,
+                options.FrequenciesPerLine);
+
             if (!reader.Read())
             {
                 // Read failed
@@ -224,20 +221,25 @@ namespace SineAndSoul
             }
 
             // Load new tones
-            tonesAvailable = reader.ToArray();
+            this.tonesAvailable = reader.ToArray();
+            this.baseMidiNumber = options.BaseMidiNumber;
 
             // Calculate default initial amplitudes
-            amplitudes = new double[Properties.Settings.Default.FrequenciesPerLine];
+            amplitudes = new double[options.FrequenciesPerLine];
             double nextAmplitude = 0.8;
-            for (int i = 0; i < Properties.Settings.Default.FrequenciesPerLine; i++)
+            for (int i = 0; i < options.FrequenciesPerLine; i++)
             {
                 amplitudes[i] = nextAmplitude;
                 nextAmplitude /= 1.5;
             }
 
-            savedAmplitudes = new double[(int)Properties.Settings.Default.FrequenciesPerLine];
+            savedAmplitudes = new double[options.FrequenciesPerLine];
             sinePlayer.Amplitudes = amplitudes;
-            InitializeMixer(Properties.Settings.Default.FrequenciesPerLine);
+
+            // Fix user interface
+            InitializeMixer(options.FrequenciesPerLine);
+            int highestNote = this.baseMidiNumber + this.tonesAvailable.Length - 1;
+            this.ComputerKeyboardOctaveNumeric.Value = ((highestNote - ((highestNote - this.baseMidiNumber) / 2)) / 12) - 1;
 
             audioOut.Play();
         }
@@ -253,6 +255,35 @@ namespace SineAndSoul
         }
 
         /// <summary>
+        /// Add or remove a tone from the list of playing tones using it's MIDI note number.
+        /// </summary>
+        /// <param name="midiNoteNumber">The MIDI note number corresponding to the tone.</param>
+        /// <param name="state">If Toggle.Play, sound the tone. If Toggle.Stop, make it silent.</param>
+        private void ToggleTone(int midiNoteNumber, Toggle state)
+        {
+            int lowestNoteNumber = this.baseMidiNumber;
+            int highestNoteNumber = lowestNoteNumber + tonesAvailable.Length - 1;
+
+            if (midiNoteNumber < lowestNoteNumber || midiNoteNumber > highestNoteNumber)
+            {
+                // Out of range
+                return;
+            }
+            else if (state == Toggle.Play && !this.midiNumbersPlaying[midiNoteNumber])
+            {
+                // Add the corresponding tone to the list of currently playing tones
+                this.sinePlayer.Tones.Add(tonesAvailable[midiNoteNumber - lowestNoteNumber]);
+                this.midiNumbersPlaying[midiNoteNumber] = true;
+            }
+            else if (state == Toggle.Stop && this.midiNumbersPlaying[midiNoteNumber])
+            {
+                // Remove the corresponding tone from the list of currently playing tones
+                this.sinePlayer.Tones.Remove(tonesAvailable[midiNoteNumber - lowestNoteNumber]);
+                this.midiNumbersPlaying[midiNoteNumber] = false;
+            }
+        }
+
+        /// <summary>
         /// Occurs when the user press a key on the computer keyboard. Some keys may be used to play notes and
         /// this method starts playback of the note played.
         /// </summary>
@@ -260,98 +291,7 @@ namespace SineAndSoul
         /// <param name="e">Arguments passed.</param>
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (tonesAvailable == null || tonesAvailable.Length == 0)
-            {
-                return;
-            }
-
-            switch (e.KeyCode)
-            {
-                case Keys.Z:
-                    if ((keysState & PianoKeys.Z) == 0)
-                    {
-                        sinePlayer.Tones.Add(tonesAvailable[27]);
-                        keysState = keysState | PianoKeys.Z;
-                    }
-                    break;
-                case Keys.S:
-                    if ((keysState & PianoKeys.S) == 0)
-                    {
-                        sinePlayer.Tones.Add(tonesAvailable[28]);
-                        keysState = keysState | PianoKeys.S;
-                    }
-                    break;
-                case Keys.X:
-                    if ((keysState & PianoKeys.X) == 0)
-                    {
-                        sinePlayer.Tones.Add(tonesAvailable[29]);
-                        keysState = keysState | PianoKeys.X;
-                    }
-                    break;
-                case Keys.D:
-                    if ((keysState & PianoKeys.D) == 0)
-                    {
-                        sinePlayer.Tones.Add(tonesAvailable[30]);
-                        keysState = keysState | PianoKeys.D;
-                    }
-                    break;
-                case Keys.C:
-                    if ((keysState & PianoKeys.C) == 0)
-                    {
-                        sinePlayer.Tones.Add(tonesAvailable[31]);
-                        keysState = keysState | PianoKeys.C;
-                    }
-                    break;
-                case Keys.V:
-                    if ((keysState & PianoKeys.V) == 0)
-                    {
-                        sinePlayer.Tones.Add(tonesAvailable[32]);
-                        keysState = keysState | PianoKeys.V;
-                    }
-                    break;
-                case Keys.G:
-                    if ((keysState & PianoKeys.G) == 0)
-                    {
-                        sinePlayer.Tones.Add(tonesAvailable[33]);
-                        keysState = keysState | PianoKeys.G;
-                    }
-                    break;
-                case Keys.B:
-                    if ((keysState & PianoKeys.B) == 0)
-                    {
-                        sinePlayer.Tones.Add(tonesAvailable[34]);
-                        keysState = keysState | PianoKeys.B;
-                    }
-                    break;
-                case Keys.H:
-                    if ((keysState & PianoKeys.H) == 0)
-                    {
-                        sinePlayer.Tones.Add(tonesAvailable[35]);
-                        keysState = keysState | PianoKeys.H;
-                    }
-                    break;
-                case Keys.N:
-                    if ((keysState & PianoKeys.N) == 0)
-                    {
-                        sinePlayer.Tones.Add(tonesAvailable[36]);
-                        keysState = keysState | PianoKeys.N;
-                    }
-                    break;
-                case Keys.J:
-                    if ((keysState & PianoKeys.J) == 0)
-                    {
-                        sinePlayer.Tones.Add(tonesAvailable[37]);
-                        keysState = keysState | PianoKeys.J;
-                    }
-                    break;
-                case Keys.M:
-                    if ((keysState & PianoKeys.M) == 0)
-                    {
-                        sinePlayer.Tones.Add(tonesAvailable[38]);
-                        keysState = keysState | PianoKeys.M;
-                    }
-                    break;
-            }
+            ComputerKeyboardPiano(e, Toggle.Play);
         }
 
         /// <summary>
@@ -362,64 +302,68 @@ namespace SineAndSoul
         /// <param name="e">Arguments passed.</param>
         private void MainWindow_KeyUp(object sender, KeyEventArgs e)
         {
-            if (tonesAvailable == null || tonesAvailable.Length == 0)
-            {
-                return;
-            }
+            ComputerKeyboardPiano(e, Toggle.Stop);
+        }
+
+        /// <summary>
+        /// Evaluates key up and down events and plays or stops tones accordingly.
+        /// </summary>
+        /// <param name="e">Key event arguments sent from KeyUp or KeyDown event handler.</param>
+        /// <param name="state">Wether to play or to stop the tone.</param>
+        private void ComputerKeyboardPiano(KeyEventArgs e, Toggle state) 
+        {
+            // Do nothing if we don't have any tones to play
+            if (tonesAvailable == null || tonesAvailable.Length == 0) return;
+
+            int noteNumber;
 
             switch (e.KeyCode)
             {
                 case Keys.Z:
-                    sinePlayer.Tones.Remove(tonesAvailable[27]);
-                    keysState = keysState & ~PianoKeys.Z;
+                    noteNumber = 0;
                     break;
                 case Keys.S:
-                    sinePlayer.Tones.Remove(tonesAvailable[28]);
-                    keysState = keysState & ~PianoKeys.S;
+                    noteNumber = 1;
                     break;
                 case Keys.X:
-                    sinePlayer.Tones.Remove(tonesAvailable[29]);
-                    keysState = keysState & ~PianoKeys.X;
+                    noteNumber = 2;
                     break;
                 case Keys.D:
-                    sinePlayer.Tones.Remove(tonesAvailable[30]);
-                    keysState = keysState & ~PianoKeys.D;
+                    noteNumber = 3;
                     break;
                 case Keys.C:
-                    sinePlayer.Tones.Remove(tonesAvailable[31]);
-                    keysState = keysState & ~PianoKeys.C;
+                    noteNumber = 4;
                     break;
                 case Keys.V:
-                    sinePlayer.Tones.Remove(tonesAvailable[32]);
-                    keysState = keysState & ~PianoKeys.V;
+                    noteNumber = 5;
                     break;
                 case Keys.G:
-                    sinePlayer.Tones.Remove(tonesAvailable[33]);
-                    keysState = keysState & ~PianoKeys.G;
+                    noteNumber = 6;
                     break;
                 case Keys.B:
-                    sinePlayer.Tones.Remove(tonesAvailable[34]);
-                    keysState = keysState & ~PianoKeys.B;
+                    noteNumber = 7;
                     break;
                 case Keys.H:
-                    sinePlayer.Tones.Remove(tonesAvailable[35]);
-                    keysState = keysState & ~PianoKeys.H;
+                    noteNumber = 8;
                     break;
                 case Keys.N:
-                    sinePlayer.Tones.Remove(tonesAvailable[36]);
-                    keysState = keysState & ~PianoKeys.N;
+                    noteNumber = 9;
                     break;
                 case Keys.J:
-                    sinePlayer.Tones.Remove(tonesAvailable[37]);
-                    keysState = keysState & ~PianoKeys.J;
+                    noteNumber = 10;
                     break;
                 case Keys.M:
-                    sinePlayer.Tones.Remove(tonesAvailable[38]);
-                    keysState = keysState & ~PianoKeys.M;
+                    noteNumber = 11;
                     break;
+                default:
+                    return;
             }
-        }
 
+            // Adjust for chosen octave and play back
+            noteNumber += ((int)this.ComputerKeyboardOctaveNumeric.Value + 1) * 12;
+            this.ToggleTone(noteNumber, state);
+        }
+        
         /// <summary>
         /// Occurs when the user selects Settings in the File menu. Opens the settings dialog.
         /// </summary>
@@ -446,13 +390,23 @@ namespace SineAndSoul
         /// <param name="e">Arguments passed.</param>
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (Properties.Settings.Default.SaveSettingsOnExit)
-            {
-                Properties.Settings.Default.Save();
-            }
-
             this.audioOut.Dispose();
             this.Dispose();
+        }
+
+        /// <summary>
+        /// Occurs when the user changes the computer keyboard piano playback octave. Clear the list of currently playing tones.
+        /// </summary>
+        /// <param name="sender">Calling object.</param>
+        /// <param name="e">Arguments passed.</param>
+        private void ComputerKeyboardOctaveNumeric_ValueChanged(object sender, EventArgs e)
+        {
+            for (int i = 0; i < this.midiNumbersPlaying.Length; i++)
+            {
+                this.midiNumbersPlaying[i] = false;
+            }
+                
+            this.sinePlayer.Tones.Clear();
         }
     }
 }

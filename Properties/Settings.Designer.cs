@@ -73,13 +73,25 @@ namespace SineAndSoul.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool SaveSettingsOnExit {
+        [global::System.Configuration.DefaultSettingValueAttribute("A")]
+        public string BaseNote {
             get {
-                return ((bool)(this["SaveSettingsOnExit"]));
+                return ((string)(this["BaseNote"]));
             }
             set {
-                this["SaveSettingsOnExit"] = value;
+                this["BaseNote"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int BaseOctave {
+            get {
+                return ((int)(this["BaseOctave"]));
+            }
+            set {
+                this["BaseOctave"] = value;
             }
         }
     }

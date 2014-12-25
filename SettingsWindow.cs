@@ -17,9 +17,6 @@ namespace SineAndSoul
     /// </summary>
     public partial class SettingsWindow : Form
     {
-        // A reference to the MainWindow object opening this window
-        //private MainWindow caller;
-
         /// <summary>
         /// Initializes a new instance of the SettingsWindow class.
         /// </summary>
@@ -39,7 +36,8 @@ namespace SineAndSoul
             this.DecimalMarkTextBox.Text = Properties.Settings.Default.ImportDecimalMark.ToString();
             this.FrequenciesPerLineNumeric.Value = Properties.Settings.Default.FrequenciesPerLine;
             this.LatencyNumeric.Value = Properties.Settings.Default.Latency;
-            this.SaveSettingsCheckBox.Checked = Properties.Settings.Default.SaveSettingsOnExit;
+            this.BaseNoteComboBox.SelectedItem = Properties.Settings.Default.BaseNote;
+            this.BaseOctaveNumeric.Value = Properties.Settings.Default.BaseOctave;
         }
 
         /// <summary>
@@ -63,9 +61,10 @@ namespace SineAndSoul
             Properties.Settings.Default.ImportDecimalMark = Convert.ToChar(this.DecimalMarkTextBox.Text);
             Properties.Settings.Default.FrequenciesPerLine = (int)this.FrequenciesPerLineNumeric.Value;
             Properties.Settings.Default.Latency = (int)this.LatencyNumeric.Value;
-            Properties.Settings.Default.SaveSettingsOnExit = this.SaveSettingsCheckBox.Checked;
+            Properties.Settings.Default.BaseNote = this.BaseNoteComboBox.SelectedItem.ToString();
+            Properties.Settings.Default.BaseOctave = (int)this.BaseOctaveNumeric.Value;
+            Properties.Settings.Default.Save();
 
-            this.Dispose();
             this.Close();
         }
 
@@ -76,7 +75,6 @@ namespace SineAndSoul
         /// <param name="e">Arguments passed.</param>
         private void SettingsCancelButton_Click(object sender, EventArgs e)
         {
-            this.Dispose();
             this.Close();
         }
 
@@ -89,6 +87,11 @@ namespace SineAndSoul
         {
             Properties.Settings.Default.Reset();
             this.UpdateControls();
+        }
+
+        private void SettingsWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            this.Dispose();
         }
     }
 }

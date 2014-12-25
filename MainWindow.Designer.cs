@@ -36,7 +36,12 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MixerGroupBox = new System.Windows.Forms.GroupBox();
+            this.PlaybackGroupBox = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.ComputerKeyboardOctaveNumeric = new System.Windows.Forms.NumericUpDown();
             this.menuStrip1.SuspendLayout();
+            this.PlaybackGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ComputerKeyboardOctaveNumeric)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -101,11 +106,51 @@
             this.MixerGroupBox.TabStop = false;
             this.MixerGroupBox.Text = "Overtone Mixer";
             // 
+            // PlaybackGroupBox
+            // 
+            this.PlaybackGroupBox.Controls.Add(this.ComputerKeyboardOctaveNumeric);
+            this.PlaybackGroupBox.Controls.Add(this.label1);
+            this.PlaybackGroupBox.Location = new System.Drawing.Point(13, 417);
+            this.PlaybackGroupBox.Name = "PlaybackGroupBox";
+            this.PlaybackGroupBox.Size = new System.Drawing.Size(704, 100);
+            this.PlaybackGroupBox.TabIndex = 3;
+            this.PlaybackGroupBox.TabStop = false;
+            this.PlaybackGroupBox.Text = "Playback";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(20, 27);
+            this.label1.MaximumSize = new System.Drawing.Size(100, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(99, 26);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Computer keyboard playback octave";
+            // 
+            // ComputerKeyboardOctaveNumeric
+            // 
+            this.ComputerKeyboardOctaveNumeric.Location = new System.Drawing.Point(23, 56);
+            this.ComputerKeyboardOctaveNumeric.Maximum = new decimal(new int[] {
+            9,
+            0,
+            0,
+            0});
+            this.ComputerKeyboardOctaveNumeric.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            -2147483648});
+            this.ComputerKeyboardOctaveNumeric.Name = "ComputerKeyboardOctaveNumeric";
+            this.ComputerKeyboardOctaveNumeric.Size = new System.Drawing.Size(96, 20);
+            this.ComputerKeyboardOctaveNumeric.TabIndex = 1;
+            this.ComputerKeyboardOctaveNumeric.ValueChanged += new System.EventHandler(this.ComputerKeyboardOctaveNumeric_ValueChanged);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(729, 422);
+            this.ClientSize = new System.Drawing.Size(729, 530);
+            this.Controls.Add(this.PlaybackGroupBox);
             this.Controls.Add(this.MixerGroupBox);
             this.Controls.Add(this.menuStrip1);
             this.KeyPreview = true;
@@ -117,6 +162,9 @@
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainWindow_KeyUp);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.PlaybackGroupBox.ResumeLayout(false);
+            this.PlaybackGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ComputerKeyboardOctaveNumeric)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -132,6 +180,9 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.GroupBox PlaybackGroupBox;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.NumericUpDown ComputerKeyboardOctaveNumeric;
 
     }
 }
