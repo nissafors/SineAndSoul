@@ -7,11 +7,16 @@ drawbars on an organ. Play back by pressing the computer keys zsxdcvgbhnjm.
 
 ## Wishlist
 This program is still in an early stage of development. Here's a few wishes for the future:
-* MIDI keyboard playback
-* Native open & save.
+* Audio improvements
+  * No clicks when starting and stopping tones
+  * Pre-calculate sine waves for better performance and lower latency
+  * ASIO driver alternative
 * UI improvements:
+  * MIDI keyboard playback
   * Display currently playing notes and frequencies
   * Mute all-button
+  * Faders follow dB scale
+  * Native open & save
 
 ## Development
 Sine & Soul is written in C# using Visual Studio. It uses the NAudio library which can be installed
