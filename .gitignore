@@ -1,2 +1,11 @@
-bin/
-obj/
+## Gitignore for Sine & Soul
+
+# User specific files
+*.user
+
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# Others
+*.pfx
