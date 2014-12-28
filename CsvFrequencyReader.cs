@@ -114,18 +114,19 @@ namespace SineAndSoul
                     // Extract values. First row may be a header. If more than one row on a line can't be converted to double, skip that line
                     while(toneIndex < this.FrequenciesPerTone)
                     {
+                        // Make sure decimal mark is '.'
                         if (DecimalMark != '.' && valuesIndex < values.Length)
                         {
                             values[valuesIndex] = values[valuesIndex].Replace(DecimalMark, '.');
                         }
 
-                        try
+                        // Parse values using decimal point
+                        if (double.TryParse(values[valuesIndex], System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.NumberFormatInfo.InvariantInfo, out tone[toneIndex]))
                         {
-                            tone[toneIndex] = Convert.ToDouble(values[valuesIndex]);
                             lastTryFailed = false;
                             toneIndex++;
                         }
-                        catch
+                        else
                         {
                             if (lastTryFailed) break;
                             lastTryFailed = true;
