@@ -13,6 +13,7 @@ namespace SineAndSoul
     using System.Collections.Generic;
     using System.Windows.Forms;
     using NAudio.Wave;
+    using NAudio.Midi;
 
     /// <summary>
     /// The main GUI window form.
@@ -21,6 +22,9 @@ namespace SineAndSoul
     {
         // NAudio driver
         private WaveOut audioOut;
+
+        // MIDI monitor
+        private MidiMonitor midiInMonitor;
 
         // This is at the heart of the program, providing samples for NAudio's buffer by adding sine waves.
         private SineSumSampleProvider sinePlayer;
@@ -46,8 +50,20 @@ namespace SineAndSoul
         /// </summary>
         public MainWindow()
         {
-            // Draw designer controls
             InitializeComponent();
+
+            // If a device is found, begin listening for incoming MIDI messages.
+            midiInMonitor = new MidiMonitor();
+            if (midiInMonitor.SelectedDevice != null)
+            {
+                Properties.Settings.Default.MidiDeviceNumber = (int)midiInMonitor.SelectedDevice;
+                this.midiInMonitor.MidiInDevice.MessageReceived += new EventHandler<MidiInMessageEventArgs>(MidiInDevice_messageHandler);
+                this.midiInMonitor.StartMidiMonitoring();
+            }
+            else
+            {
+                Properties.Settings.Default.MidiDeviceNumber = -1;
+            }
 
             // Init audio
             this.sinePlayer = new SineSumSampleProvider(44100, 1);
@@ -252,6 +268,26 @@ namespace SineAndSoul
         private void QuitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        /// <summary>
+        /// MIDI in event handler.
+        /// </summary>
+        /// <param name="sender">Calling object.</param>
+        /// <param name="e">Arguments passed.</param>
+        private void MidiInDevice_messageHandler(object sender, MidiInMessageEventArgs e)
+        {
+            //MessageBox.Show("MIDI message recieved.");
+            if (MidiEvent.IsNoteOn(e.MidiEvent))
+            {
+                ToggleTone(((NoteOnEvent)e.MidiEvent).NoteNumber, Toggle.Play);
+            }
+            else if (MidiEvent.IsNoteOff(e.MidiEvent))
+            {
+                ToggleTone(((NoteEvent)e.MidiEvent).NoteNumber, Toggle.Stop);
+            }
+
+
         }
 
         /// <summary>

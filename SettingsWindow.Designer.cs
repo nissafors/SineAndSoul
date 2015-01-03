@@ -46,12 +46,16 @@
             this.BaseOctaveNumeric = new System.Windows.Forms.NumericUpDown();
             this.BaseNoteComboBox = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
+            this.MidiGroupBox = new System.Windows.Forms.GroupBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.MidiDevicesComboBox = new System.Windows.Forms.ComboBox();
             this.ImportCSVGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FrequenciesPerLineNumeric)).BeginInit();
             this.AudioGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.LatencyNumeric)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.BaseOctaveNumeric)).BeginInit();
+            this.MidiGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // SettingsCancelButton
@@ -61,7 +65,7 @@
             this.SettingsCancelButton.Location = new System.Drawing.Point(345, 236);
             this.SettingsCancelButton.Name = "SettingsCancelButton";
             this.SettingsCancelButton.Size = new System.Drawing.Size(75, 23);
-            this.SettingsCancelButton.TabIndex = 7;
+            this.SettingsCancelButton.TabIndex = 8;
             this.SettingsCancelButton.Text = "Cancel";
             this.SettingsCancelButton.UseVisualStyleBackColor = true;
             this.SettingsCancelButton.Click += new System.EventHandler(this.SettingsCancelButton_Click);
@@ -72,7 +76,7 @@
             this.OKButton.Location = new System.Drawing.Point(264, 236);
             this.OKButton.Name = "OKButton";
             this.OKButton.Size = new System.Drawing.Size(75, 23);
-            this.OKButton.TabIndex = 6;
+            this.OKButton.TabIndex = 7;
             this.OKButton.Text = "Save";
             this.OKButton.UseVisualStyleBackColor = true;
             this.OKButton.Click += new System.EventHandler(this.OKButton_Click);
@@ -192,7 +196,7 @@
             this.ResetButton.Location = new System.Drawing.Point(12, 235);
             this.ResetButton.Name = "ResetButton";
             this.ResetButton.Size = new System.Drawing.Size(110, 23);
-            this.ResetButton.TabIndex = 5;
+            this.ResetButton.TabIndex = 6;
             this.ResetButton.Text = "Restore default";
             this.ResetButton.UseVisualStyleBackColor = true;
             this.ResetButton.Click += new System.EventHandler(this.ResetButton_Click);
@@ -266,6 +270,34 @@
             this.label5.TabIndex = 0;
             this.label5.Text = "Note";
             // 
+            // MidiGroupBox
+            // 
+            this.MidiGroupBox.Controls.Add(this.MidiDevicesComboBox);
+            this.MidiGroupBox.Controls.Add(this.label7);
+            this.MidiGroupBox.Location = new System.Drawing.Point(220, 85);
+            this.MidiGroupBox.Name = "MidiGroupBox";
+            this.MidiGroupBox.Size = new System.Drawing.Size(200, 64);
+            this.MidiGroupBox.TabIndex = 0;
+            this.MidiGroupBox.TabStop = false;
+            this.MidiGroupBox.Text = "MIDI";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(21, 27);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(41, 13);
+            this.label7.TabIndex = 0;
+            this.label7.Text = "Device";
+            // 
+            // MidiDevicesComboBox
+            // 
+            this.MidiDevicesComboBox.FormattingEnabled = true;
+            this.MidiDevicesComboBox.Location = new System.Drawing.Point(68, 24);
+            this.MidiDevicesComboBox.Name = "MidiDevicesComboBox";
+            this.MidiDevicesComboBox.Size = new System.Drawing.Size(117, 21);
+            this.MidiDevicesComboBox.TabIndex = 5;
+            // 
             // SettingsWindow
             // 
             this.AcceptButton = this.OKButton;
@@ -273,6 +305,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.SettingsCancelButton;
             this.ClientSize = new System.Drawing.Size(432, 271);
+            this.Controls.Add(this.MidiGroupBox);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.ResetButton);
             this.Controls.Add(this.AudioGroupBox);
@@ -292,6 +325,8 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.BaseOctaveNumeric)).EndInit();
+            this.MidiGroupBox.ResumeLayout(false);
+            this.MidiGroupBox.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -316,5 +351,8 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.NumericUpDown BaseOctaveNumeric;
+        private System.Windows.Forms.GroupBox MidiGroupBox;
+        private System.Windows.Forms.ComboBox MidiDevicesComboBox;
+        private System.Windows.Forms.Label label7;
     }
 }

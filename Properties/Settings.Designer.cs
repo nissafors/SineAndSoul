@@ -94,5 +94,17 @@ namespace SineAndSoul.Properties {
                 this["BaseOctave"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int MidiDeviceNumber {
+            get {
+                return ((int)(this["MidiDeviceNumber"]));
+            }
+            set {
+                this["MidiDeviceNumber"] = value;
+            }
+        }
     }
 }

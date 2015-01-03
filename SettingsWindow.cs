@@ -11,12 +11,16 @@ namespace SineAndSoul
 {
     using System;
     using System.Windows.Forms;
+    using System.Linq;
 
     /// <summary>
     /// The settings window.
     /// </summary>
     public partial class SettingsWindow : Form
     {
+        // The product names of all MIDI devices found.
+        private string[] midiDeviceNames;
+
         /// <summary>
         /// Initializes a new instance of the SettingsWindow class.
         /// </summary>
@@ -32,6 +36,24 @@ namespace SineAndSoul
         /// </summary>
         private void UpdateControls()
         {
+            // Populate MIDI devices groupbox
+            midiDeviceNames = MidiMonitor.GetMidiDevices();
+
+            if (midiDeviceNames != null)
+            {
+                this.MidiDevicesComboBox.Items.AddRange(midiDeviceNames);
+                if (Properties.Settings.Default.MidiDeviceNumber < 1 ||
+                    Properties.Settings.Default.MidiDeviceNumber >= midiDeviceNames.Length)
+                {
+                    this.MidiDevicesComboBox.SelectedIndex = 0;
+                }
+                else
+                {
+                    this.MidiDevicesComboBox.SelectedIndex = Properties.Settings.Default.MidiDeviceNumber;
+                }
+            }
+
+            // Set the remaining controls
             this.DelimiterTextBox.Text = Properties.Settings.Default.ImportDelimiter.ToString();
             this.DecimalMarkTextBox.Text = Properties.Settings.Default.ImportDecimalMark.ToString();
             this.FrequenciesPerLineNumeric.Value = Properties.Settings.Default.FrequenciesPerLine;
@@ -47,6 +69,7 @@ namespace SineAndSoul
         /// <param name="e">Arguments passed.</param>
         private void OKButton_Click(object sender, System.EventArgs e)
         {
+            // Check for errors
             if (DelimiterTextBox.Text == DecimalMarkTextBox.Text)
             {
                 MessageBox.Show("Delimiter and decimal mark must be different characters!",
@@ -56,7 +79,40 @@ namespace SineAndSoul
                 return;
             }
 
+            // Did we loose (or gain) any MIDI devices while this window was open?
+            int selectedDevice;
+            bool devicesChanged = false;
+            string[] devices = MidiMonitor.GetMidiDevices();
+
+            if (devices == null && midiDeviceNames == null)
+            {
+                devicesChanged = false;
+            }
+            else if ((devices == null && midiDeviceNames != null) ||
+                (devices != null && midiDeviceNames == null))
+            {
+                devicesChanged = true;
+            }
+            else
+            {
+                devicesChanged = !devices.SequenceEqual(midiDeviceNames);
+            }
+
+            if (devicesChanged)
+            {
+                MessageBox.Show("MIDI device list changed! Selecting none.",
+                    "Warning!",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                selectedDevice = -1;
+            }
+            else
+            {
+                selectedDevice = MidiDevicesComboBox.SelectedIndex;
+            }
+            
             // Save settings
+            Properties.Settings.Default.MidiDeviceNumber = selectedDevice;
             Properties.Settings.Default.ImportDelimiter = Convert.ToChar(this.DelimiterTextBox.Text);
             Properties.Settings.Default.ImportDecimalMark = Convert.ToChar(this.DecimalMarkTextBox.Text);
             Properties.Settings.Default.FrequenciesPerLine = (int)this.FrequenciesPerLineNumeric.Value;
