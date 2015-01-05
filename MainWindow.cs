@@ -271,23 +271,38 @@ namespace SineAndSoul
         }
 
         /// <summary>
+        /// Used by the MIDI event handler to make thread safe calls to ToggleTone.
+        /// </summary>
+        /// <param name="midiNoteNumber">See the ToggleTone() method.</param>
+        /// <param name="state">See the ToggleTone() method.</param>
+        private delegate void ToggleToneDelegate(int midiNoteNumber, Toggle state);
+
+        /// <summary>
         /// MIDI in event handler.
         /// </summary>
         /// <param name="sender">Calling object.</param>
         /// <param name="e">Arguments passed.</param>
         private void MidiInDevice_messageHandler(object sender, MidiInMessageEventArgs e)
         {
-            //MessageBox.Show("MIDI message recieved.");
+            // Do nothing if we don't have any tones to play
+            if (tonesAvailable == null || tonesAvailable.Length == 0) return;
+
+            // Call ToggleTone on the UI thread using Invoke
+            ToggleToneDelegate ttd = new ToggleToneDelegate(ToggleTone);
+            Object[] args = new Object[2];
+
             if (MidiEvent.IsNoteOn(e.MidiEvent))
             {
-                ToggleTone(((NoteOnEvent)e.MidiEvent).NoteNumber, Toggle.Play);
+                args[0] = ((NoteOnEvent)e.MidiEvent).NoteNumber;
+                args[1] = Toggle.Play;
+                Invoke(ttd, args);
             }
             else if (MidiEvent.IsNoteOff(e.MidiEvent))
             {
-                ToggleTone(((NoteEvent)e.MidiEvent).NoteNumber, Toggle.Stop);
+                args[0] = ((NoteEvent)e.MidiEvent).NoteNumber;
+                args[1] = Toggle.Stop;
+                Invoke(ttd, args);
             }
-
-
         }
 
         /// <summary>

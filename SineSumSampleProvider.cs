@@ -26,16 +26,6 @@ namespace SineAndSoul
         private double time = 0;
 
         /// <summary>
-        /// Sets the overtone frequencies for each tone playing.
-        /// </summary>
-        public List<double[]> Tones { get; set; }
-
-        /// <summary>
-        /// Sets the amplitudes for each overtone.
-        /// </summary>
-        public double[] Amplitudes { private get; set; }
-
-        /// <summary>
         /// Initializes a new instance of the Tone class, an ISampleProvider that
         /// reads fundamental tone and overtone characteristics from a file.
         /// </summary>
@@ -47,6 +37,16 @@ namespace SineAndSoul
             waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(sampleRate, channel);
             Tones = new List<double[]>();
         }
+
+        /// <summary>
+        /// Sets the overtone frequencies for each tone playing.
+        /// </summary>
+        public List<double[]> Tones { get; set; }
+
+        /// <summary>
+        /// Sets the amplitudes for each overtone.
+        /// </summary>
+        public double[] Amplitudes { private get; set; }
 
         /// <summary>
         /// The waveformat of this WaveProvider (same as the source)

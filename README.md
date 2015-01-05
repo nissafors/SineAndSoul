@@ -12,7 +12,7 @@ This program is still in an early stage of development. Here's a few wishes for 
   * Pre-calculate sine waves for better performance and lower latency
   * ASIO driver alternative
 * UI improvements:
-  * MIDI keyboard playback
+  * More robust MIDI keyboard support
   * Display currently playing notes and frequencies
   * Mute all-button
   * Faders follow dB scale
